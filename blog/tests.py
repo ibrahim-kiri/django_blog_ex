@@ -46,5 +46,31 @@ class BlogTests(TestCase):
         self.assertContains(response, "News in Python")
         self.assertTemplateUsed(response, "post_detail.html")
 
-    
+    def test_post_createview(self):
+        response = self.client.post(
+                reverse("post_new"),
+                {
+                    "title": "Machine Learning",
+                    "body": "Linear regression and classification influence most of the AI models in this era",
+                    "author": self.user.id,
+                },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Post.objects.last().title, "Machine Learning")
+        self.assertEqual(Post.objects.last().body, "Linear regression and classification influence most of the AI models in this era")
 
+    def test_post_updateview(self):
+        response = self.client.post(
+                reverse("post_edit", args="1"),
+                {
+                    "title": "AI/ML",
+                    "body": "Linear regression and classification influence most of the AI/ML models in this era"
+                },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Post.objects.last().title, "AI/ML")
+        self.assertEqual(Post.objects.last().body, "Linear regression and classification influence most of the AI/ML models in this era")
+
+    def test_post_deleteview(self):
+        response = self.client.post(reverse("post_delete", args="1"))
+        self.assertEqual(response.status_code, 302)
